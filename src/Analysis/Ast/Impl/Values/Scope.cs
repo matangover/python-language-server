@@ -82,6 +82,8 @@ namespace Microsoft.Python.Analysis.Values {
         public void DeclareGlobal(string name, LocationInfo location)
             => (_globals ?? (_globals = new VariableCollection())).DeclareVariable(name, null, VariableSource.Locality, location);
 
+        public bool? IsStaticallyTyped { get; set; }
+
         #endregion
 
         internal void AddChildScope(Scope s) => (_childScopes ?? (_childScopes = new List<Scope>())).Add(s);
@@ -131,6 +133,6 @@ namespace Microsoft.Python.Analysis.Values {
         public  IVariableCollection Globals => VariableCollection.Empty;
 
         public void DeclareVariable(string name, IMember value, VariableSource source, LocationInfo location) { }
-
+        public bool? IsStaticallyTyped { get => true; set {} }
     }
 }
