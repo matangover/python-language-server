@@ -1,4 +1,4 @@
-// Copyright(c) Microsoft Corporation
+﻿// Copyright(c) Microsoft Corporation
 // All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the License); you may not use
@@ -191,10 +191,11 @@ namespace Microsoft.Python.Analysis.Analyzer.Evaluation {
 
             // Try and evaluate with specific arguments. Note that it does not
             // make sense to evaluate stubs since they already should be annotated.
-            if (fn.DeclaringModule is IDocument doc && fd?.IsInAst(doc.GetAnyAst()) == true) {
-                // Stubs are coming from another module.
-                return TryEvaluateWithArguments(fn.DeclaringModule, fd, args);
-            }
+            // **DISABLED**: This was used to set function return type based on function body.
+            // if (fn.DeclaringModule is IDocument doc && fd?.IsInAst(doc.GetAnyAst()) == true) {
+            //     // Stubs are coming from another module.
+            //     return TryEvaluateWithArguments(fn.DeclaringModule, fd, args);
+            // }
             return UnknownType;
         }
 
