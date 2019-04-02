@@ -33,7 +33,7 @@ namespace Microsoft.Python.Analysis.Analyzer.Symbols {
         private readonly PythonFunctionOverload _overload;
         private readonly IPythonClassType _self;
 
-        public FunctionEvaluator(ExpressionEval eval, PythonFunctionOverload overload) 
+        public FunctionEvaluator(ExpressionEval eval, PythonFunctionOverload overload)
             : base(eval, overload.FunctionDefinition) {
 
             _overload = overload;
@@ -86,6 +86,18 @@ namespace Microsoft.Python.Analysis.Analyzer.Symbols {
         }
 
         public override bool Walk(AssignmentStatement node) {
+            // if (!IsStaticallyTyped()) {
+                // **DISABLED**: in unannotated functions, don't do any type inference.
+                // Type inference was done in base.Walk below:
+                // AnalysisWalker.Walk(AssignmentStatement) calls AssignmentHandler.HandleAssignment,
+                // which calls ExpressionEval.DeclareVariable.
+                // **ACTUALLY** we do want to declare the variable. Otherwise any variable declared
+                // will have an 'Undefined variable' error. We want a variable with type 'Any'.
+                // In fact instead of the assignment we need to focus on the actual variable reference
+                // typing.
+                // return true;
+            // }
+
             var value = Eval.GetValueFromExpression(node.Right) ?? Eval.UnknownType;
 
             foreach (var lhs in node.Left) {
@@ -106,7 +118,7 @@ namespace Microsoft.Python.Analysis.Analyzer.Symbols {
         public override bool Walk(ReturnStatement node) {
             var value = Eval.GetValueFromExpression(node.Expression);
             if (value != null) {
-                _overload.AddReturnValue(value);
+                // _overload.AddReturnValue(value);
             }
             return true; // We want to evaluate all code so all private variables in __new__ get defined
         }
