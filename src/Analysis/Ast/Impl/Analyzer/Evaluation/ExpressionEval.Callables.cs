@@ -156,7 +156,8 @@ namespace Microsoft.Python.Analysis.Analyzer.Evaluation {
             // may contain concrete values.
             if (fd != null) {
                 using (OpenScope(fn.DeclaringModule, fn.FunctionDefinition, out _)) {
-                    args.DeclareParametersInScope(this);
+                    // **DISABLED**: This was used to set parameter type based on function calls.
+                    // args.DeclareParametersInScope(this);
                 }
             }
 
