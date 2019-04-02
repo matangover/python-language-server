@@ -29,10 +29,18 @@ namespace Microsoft.Python.Analysis.Analyzer.Evaluation {
         private readonly ConcurrentDictionary<ScopeStatement, Scope> _scopeLookupCache = new ConcurrentDictionary<ScopeStatement, Scope>();
 
         public IMember GetInScope(string name, IScope scope)
-            => scope.Variables.TryGetVariable(name, out var variable) ? variable.Value : null;
+            => scope.Variables.TryGetVariable(name, out var variable) ? GetVariableValue(scope, variable) : null;
 
         public T GetInScope<T>(string name, IScope scope) where T : class, IMember
-            => scope.Variables.TryGetVariable(name, out var variable) ? variable.Value as T : null;
+            => scope.Variables.TryGetVariable(name, out var variable) ? GetVariableValue(scope, variable) as T : null;
+
+        IMember GetVariableValue(IScope scope, IVariable variable) {
+            if (IsStaticallyTyped(scope)) {
+                return variable.Value;
+            } else {
+                return UnknownType;
+            }
+        }
 
         public IMember GetInScope(string name) => GetInScope(name, CurrentScope);
         public T GetInScope<T>(string name) where T : class, IMember => GetInScope<T>(name, CurrentScope);
@@ -104,6 +112,10 @@ namespace Microsoft.Python.Analysis.Analyzer.Evaluation {
                     value = builtins.GetMember(name);
                     scope = builtins.GlobalScope;
                 }
+            }
+
+            if (value != null && !IsStaticallyTyped(CurrentScope)) {
+                return UnknownType;
             }
 
             return value;
@@ -204,6 +216,28 @@ namespace Microsoft.Python.Analysis.Analyzer.Evaluation {
                 }
                 _eval.CurrentScope = _eval._openScopes.Count == 0 ? _eval.GlobalScope : _eval._openScopes.Peek();
             }
+        }
+
+        bool IsStaticallyTyped(IScope scope) {
+            if (!scope.IsStaticallyTyped.HasValue) {
+                Log?.Log(TraceEventType.Information, "IsStaticallyTyped: " + scope.Name + " (not cached)");
+                scope.IsStaticallyTyped = CheckIfScopeIsStaticallyTyped(scope);
+            } else {
+                Log?.Log(TraceEventType.Information, "IsStaticallyTyped: " + scope.Name + " (cached)");
+            }
+            return scope.IsStaticallyTyped.Value;
+        }
+
+        bool CheckIfScopeIsStaticallyTyped(IScope scope) {
+            if (!(scope.Node is FunctionDefinition func)) {
+                return true;
+            }
+
+            if (func.ReturnAnnotation != null) {
+                return true;
+            }
+            var anyParameterHasAnnotation = func.Parameters.Any(p => p.Annotation != null);
+            return anyParameterHasAnnotation;
         }
     }
 }
