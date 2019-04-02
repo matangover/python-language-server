@@ -1,4 +1,4 @@
-﻿// Copyright(c) Microsoft Corporation
+// Copyright(c) Microsoft Corporation
 // All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the License); you may not use
@@ -130,7 +130,7 @@ namespace Microsoft.Python.Analysis.Analyzer.Evaluation {
         public IMember GetValueFromFunctionType(IPythonFunctionType fn, IPythonInstance instance, CallExpression expr) {
             // If order to be able to find matching overload, we need to know
             // parameter types and count. This requires function to be analyzed.
-            // Since we don't know which overload we will need, we have to 
+            // Since we don't know which overload we will need, we have to
             // process all known overloads for the function.
             foreach (var o in fn.Overloads) {
                 SymbolTable.Evaluate(o.FunctionDefinition);
@@ -156,7 +156,8 @@ namespace Microsoft.Python.Analysis.Analyzer.Evaluation {
             // may contain concrete values.
             if (fd != null) {
                 using (OpenScope(fn.DeclaringModule, fn.FunctionDefinition, out _)) {
-                    args.DeclareParametersInScope(this);
+                    // **DISABLED**: This was used to set parameter type based on function calls.
+                    // args.DeclareParametersInScope(this);
                 }
             }
 
@@ -246,7 +247,7 @@ namespace Microsoft.Python.Analysis.Analyzer.Evaluation {
         private static bool IsMatch(IArgumentSet args, IReadOnlyList<IParameterInfo> parameters) {
             // Arguments passed to function are created off the function definition
             // and hence match by default. However, if multiple overloads are specified,
-            // we need to figure out if annotated types match. 
+            // we need to figure out if annotated types match.
             // https://docs.python.org/3/library/typing.html#typing.overload
             //
             //  @overload
