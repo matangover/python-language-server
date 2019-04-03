@@ -46,7 +46,7 @@ namespace Microsoft.Python.Analysis.Analyzer.Evaluation {
             CurrentScope = GlobalScope;
             DefaultLookupOptions = LookupOptions.Normal;
 
-            Log = services.GetService<ILogger>();
+            // Log = services.GetService<ILogger>();
         }
 
         public LookupOptions DefaultLookupOptions { get; set; }
