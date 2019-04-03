@@ -111,6 +111,11 @@ namespace Microsoft.Python.Analysis.Modules.Resolution {
                 return stub;
             }
 
+            if (stub != null) {
+                _log?.Log(TraceEventType.Verbose, "Returning stub: ", moduleImport.FullName, moduleImport.ModulePath);
+                return stub;
+            }
+
             if (moduleImport.IsBuiltin) {
                 _log?.Log(TraceEventType.Verbose, "Create built-in compiled (scraped) module: ", name, Configuration.InterpreterPath);
                 module = new CompiledBuiltinPythonModule(name, stub, _services);
