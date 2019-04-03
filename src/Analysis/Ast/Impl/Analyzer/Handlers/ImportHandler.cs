@@ -110,6 +110,11 @@ namespace Microsoft.Python.Analysis.Analyzer.Handlers {
         private bool TryGetModuleFromImport(in ModuleImport moduleImport, in PythonVariableModule parent, LocationInfo location, out PythonVariableModule variableModule) {
             var module = ModuleResolution.GetOrLoadModule(moduleImport.FullName);
             if (module != null) {
+                if (module.ModuleType == ModuleType.Unresolved) {
+                    Eval.ReportDiagnostics(Eval.Module.Uri, new DiagnosticsEntry($"Untyped library import: '{moduleImport.Name}'", location.Span, ErrorCodes.UnresolvedImport, Severity.Warning, DiagnosticSource.Analysis));
+                    variableModule = default;
+                    return false;
+                }
                 variableModule = GetOrCreateVariableModule(module, parent, moduleImport.Name);
                 return true;
             }
