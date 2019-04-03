@@ -117,8 +117,24 @@ namespace Microsoft.Python.Analysis.Modules.Resolution {
             }
 
             if (moduleImport.IsLibrary) {
-                _log?.Log(TraceEventType.Verbose, "Skipping library import: ", moduleImport.FullName, moduleImport.ModulePath);
-                return new SentinelModule(moduleImport.FullName, _services);
+                var pathComponents = moduleImport.FullName.Split('.');
+                var path = moduleImport.RootPath;
+                var found = false;
+                foreach (var component in pathComponents)
+                {
+                    path = Path.Combine(path, component);
+                    string typedMarker = Path.Combine(path, "py.typed");
+                    if (_fs.FileExists(typedMarker)) {
+                        found = true;
+                        _log?.Log(TraceEventType.Verbose, "Marker found: ", typedMarker);
+                        break;
+                    }
+                    _log?.Log(TraceEventType.Verbose, "Marker not found: ", typedMarker);
+                }
+                if (!found) {
+                    _log?.Log(TraceEventType.Verbose, "Skipping library import: ", moduleImport.FullName, moduleImport.ModulePath);
+                    return new SentinelModule(moduleImport.FullName, _services);
+                }
             }
 
             if (moduleImport.IsBuiltin) {
