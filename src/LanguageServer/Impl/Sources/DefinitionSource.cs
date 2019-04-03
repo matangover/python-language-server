@@ -166,7 +166,7 @@ namespace Microsoft.Python.LanguageServer.Sources {
                     }
             }
 
-            module = module?.ModuleType == ModuleType.Stub ? module.PrimaryModule : module;
+            // module = module?.ModuleType == ModuleType.Stub ? module.PrimaryModule : module;
             if (node != null && module is IDocument doc && CanNavigateToModule(module, analysis)) {
                 return new Reference {
                     range = location?.Span ?? node.GetSpan(doc.GetAnyAst()), uri = doc.Uri
