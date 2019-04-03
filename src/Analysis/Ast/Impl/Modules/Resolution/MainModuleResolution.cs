@@ -116,6 +116,11 @@ namespace Microsoft.Python.Analysis.Modules.Resolution {
                 return stub;
             }
 
+            if (moduleImport.IsLibrary) {
+                _log?.Log(TraceEventType.Verbose, "Skipping library import: ", moduleImport.FullName, moduleImport.ModulePath);
+                return new SentinelModule(moduleImport.FullName, _services);
+            }
+
             if (moduleImport.IsBuiltin) {
                 _log?.Log(TraceEventType.Verbose, "Create built-in compiled (scraped) module: ", name, Configuration.InterpreterPath);
                 module = new CompiledBuiltinPythonModule(name, stub, _services);

@@ -25,7 +25,7 @@ namespace Microsoft.Python.Analysis.Documents {
         private string _content;
 
         public int Version { get; private set; }
-        public string Text => _content ?? (_content = _sb.ToString());
+        public string Text => _content ?? (_content = _sb?.ToString());
 
         public void Reset(int version, string content) {
             Version = version;
