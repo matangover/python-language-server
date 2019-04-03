@@ -47,11 +47,12 @@ namespace Microsoft.Python.LanguageServer.Sources {
                 if (!string.IsNullOrEmpty(name) && !(statement is ImportStatement) && !(statement is FromImportStatement)) {
                     var m = eval.LookupNameInScopes(name, out var scope);
                     if (m != null && scope.Variables[name] is IVariable v) {
-                        var type = v.Value.GetPythonType();
-                        var module = type as IPythonModule ?? type?.DeclaringModule;
-                        if (CanNavigateToModule(module, analysis)) {
-                            return new Reference { range = v.Location.Span, uri = v.Location.DocumentUri };
-                        }
+                        // var type = v.Value.GetPythonType();
+                        // var module = type as IPythonModule ?? type?.DeclaringModule;
+                        // if (CanNavigateToModule(module, analysis)) {
+                        //     return new Reference { range = v.Location.Span, uri = v.Location.DocumentUri };
+                        // }
+                        return new Reference { range = v.Location.Span, uri = v.Location.DocumentUri };
                     }
                 }
 
