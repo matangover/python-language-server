@@ -111,7 +111,7 @@ namespace Microsoft.Python.Analysis.Analyzer.Handlers {
             var module = ModuleResolution.GetOrLoadModule(moduleImport.FullName);
             if (module != null) {
                 if (module.ModuleType == ModuleType.Unresolved) {
-                    Eval.ReportDiagnostics(Eval.Module.Uri, new DiagnosticsEntry($"Untyped library import: '{moduleImport.Name}'", location.Span, ErrorCodes.UnresolvedImport, Severity.Warning, DiagnosticSource.Analysis));
+                    MakeUnresolvedImport(moduleImport.FullName, moduleImport.FullName, location, $"Untyped library import: '{moduleImport.Name}'");
                     variableModule = default;
                     return false;
                 }
@@ -166,11 +166,11 @@ namespace Microsoft.Python.Analysis.Analyzer.Handlers {
             return true;
         }
 
-        private void MakeUnresolvedImport(string variableName, string moduleName, LocationInfo location) {
+        private void MakeUnresolvedImport(string variableName, string moduleName, LocationInfo location, string error = null) {
             if (!string.IsNullOrEmpty(variableName)) {
                 Eval.DeclareVariable(variableName, new SentinelModule(moduleName, Eval.Services), VariableSource.Import, location);
             }
-            Eval.ReportDiagnostics(Eval.Module.Uri, new DiagnosticsEntry(Resources.ErrorUnresolvedImport.FormatInvariant(moduleName), location.Span, ErrorCodes.UnresolvedImport, Severity.Warning, DiagnosticSource.Analysis));
+            Eval.ReportDiagnostics(Eval.Module.Uri, new DiagnosticsEntry(error ?? Resources.ErrorUnresolvedImport.FormatInvariant(moduleName), location.Span, ErrorCodes.UnresolvedImport, Severity.Warning, DiagnosticSource.Analysis));
         }
 
         private PythonVariableModule GetOrCreateVariableModule(in string fullName, in PythonVariableModule parentModule, in string memberName) {
