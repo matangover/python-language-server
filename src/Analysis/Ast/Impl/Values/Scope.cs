@@ -82,7 +82,7 @@ namespace Microsoft.Python.Analysis.Values {
         public void DeclareGlobal(string name, LocationInfo location)
             => (_globals ?? (_globals = new VariableCollection())).DeclareVariable(name, null, VariableSource.Locality, location);
 
-        public bool? IsStaticallyTyped { get; set; }
+        // public bool? IsStaticallyTyped { get; set; }
 
         #endregion
 
