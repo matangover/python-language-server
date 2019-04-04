@@ -58,3 +58,25 @@ def dynamic():
             def static2() -> None:
                 beep = bar
                 reveal_type(beep)
+
+### Go to definition of undefined variable
+bbb = hello()
+bbb # Go to definition works only after fix
+
+
+### Fix: don't scan module if stub available
+import os # <-- does not cause huge scan of stdlib - only typeshed stubs
+# os. <-- completion from stubs only (no docs unfortunately)
+
+### Fix: Don't scan third party libs if untyped
+import pytest # <-- error 'Untyped library import' [when installed, and stubs not installed]
+pytest # <-- continues to function as unresolved module
+
+### Fix: Do scan third party lib if has typing info
+import coincurve # <--- pip install coincurve coincurve-stubs
+coincurve.verify_signature(b'asf', b'asf', b'asf')
+# No error, when coincurve-stubs is also installed. Completions are correct.
+
+## TODO:
+ccc = hello + 3
+# mypy: ccc is any, vscode it's int
