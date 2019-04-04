@@ -111,18 +111,13 @@ namespace Microsoft.Python.Analysis.Core.DependencyResolution {
         }
 
         public IEnumerable<string> GetPossibleModuleStubPaths(in string fullModuleName) {
-            var firstDotIndex = fullModuleName.IndexOf('.');
-            if (firstDotIndex == -1) {
-                return Array.Empty<string>();
-            }
-
-            var relativeStubPath = new StringBuilder(fullModuleName)
-                .Replace('.', Path.DirectorySeparatorChar)
-                .Insert(firstDotIndex, "-stubs")
-                .Append(".pyi")
-                .ToString();
-
-            return _roots.Select(r => Path.Combine(r.Name, relativeStubPath));
+            var nameParts = fullModuleName.Split('.');
+            nameParts[0] += "-stubs";
+            var relativeStubPath = Path.Combine(nameParts) + ".pyi";
+            var relativeStubPackagePath = Path.Combine(nameParts.Append("__init__.pyi").ToArray());
+            return _roots.SelectMany(r => new [] {
+                Path.Combine(r.Name, relativeStubPath),
+                Path.Combine(r.Name, relativeStubPackagePath)});
         }
 
         [Pure]
