@@ -27,11 +27,11 @@ using Microsoft.Python.Parsing;
 
 namespace Microsoft.Python.Analysis.Core.DependencyResolution {
     public partial class PathResolverSnapshot {
-        // This root contains module paths that don't belong to any known search path. 
+        // This root contains module paths that don't belong to any known search path.
         // The directory of the module is stored on the first level, and name is stored on the second level
         // For example, "c:\dir\sub_dir2\module1.py" will be stored like this:
         //
-        //                                  [*] 
+        //                                  [*]
         //        ┌────────────────╔═════════╝────────┬─────────────────┐
         // [c:\dir\sub_dir] [c:\dir\sub_dir2] [c:\dir2\sub_dir] [c:\dir2\sub_dir2]
         //          ╔═════════╤════╝────┬─────────┐
@@ -111,18 +111,13 @@ namespace Microsoft.Python.Analysis.Core.DependencyResolution {
         }
 
         public IEnumerable<string> GetPossibleModuleStubPaths(in string fullModuleName) {
-            var firstDotIndex = fullModuleName.IndexOf('.');
-            if (firstDotIndex == -1) {
-                return Array.Empty<string>();
-            }
-
-            var relativeStubPath = new StringBuilder(fullModuleName)
-                .Replace('.', Path.DirectorySeparatorChar)
-                .Insert(firstDotIndex, "-stubs")
-                .Append(".pyi")
-                .ToString();
-
-            return _roots.Select(r => Path.Combine(r.Name, relativeStubPath));
+            var nameParts = fullModuleName.Split('.');
+            nameParts[0] += "-stubs";
+            var relativeStubPath = Path.Combine(nameParts) + ".pyi";
+            var relativeStubPackagePath = Path.Combine(nameParts.Append("__init__.pyi").ToArray());
+            return _roots.SelectMany(r => new [] {
+                Path.Combine(r.Name, relativeStubPath),
+                Path.Combine(r.Name, relativeStubPackagePath)});
         }
 
         [Pure]
@@ -718,7 +713,7 @@ namespace Microsoft.Python.Analysis.Core.DependencyResolution {
                 rootIndex++;
             }
 
-            // Search for module in root, or in 
+            // Search for module in root, or in
             return rootIndex < _roots.Count
                 ? MatchNodePath(normalizedPath, rootIndex, out lastEdge, out unmatchedPathSpan)
                 : MatchNodePathInNonRooted(normalizedPath, out lastEdge, out unmatchedPathSpan);
