@@ -24,7 +24,7 @@ using Microsoft.Python.Parsing.Ast;
 
 namespace Microsoft.Python.Analysis.Analyzer.Evaluation {
     internal sealed partial class ExpressionEval {
-        private readonly Stack<FunctionDefinition> _callEvalStack = new Stack<FunctionDefinition>();
+        private readonly Stack<FunctionDefinition> _callEvalStack =  new Stack<FunctionDefinition>();
 
         public IMember GetValueFromCallable(CallExpression expr) {
             if (expr?.Target == null) {
