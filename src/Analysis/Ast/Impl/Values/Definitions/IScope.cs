@@ -34,6 +34,6 @@ namespace Microsoft.Python.Analysis.Values {
         IVariableCollection Globals { get; }
         IPythonModule Module { get; }
         void DeclareVariable(string name, IMember value, VariableSource source, LocationInfo location);
-        bool? IsStaticallyTyped { get; set; }
+        // bool? IsStaticallyTyped { get; set; }
     }
 }
